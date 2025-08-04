@@ -49,7 +49,7 @@ function VerReporteProduccion() {
                   <TableCell>{reporte.fecha}</TableCell>
                   <TableCell>{reporte.nombreProduccion}</TableCell>
                   <TableCell>{reporte.cantidad}</TableCell>
-                  <TableCell>{reporte.cts}</TableCell>
+                  <TableCell>{reporte.ct}</TableCell>
                   <TableCell>{reporte.baldes}</TableCell>
                   <TableCell>{reporte.galones}</TableCell>
                 </TableRow>

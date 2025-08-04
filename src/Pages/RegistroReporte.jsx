@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './../Components/supabaseClient';
+import {
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Box,
+  Alert
+} from '@mui/material';
 
 function RegistroReporte() {
   const today = new Date().toISOString().split('T')[0];
@@ -8,17 +17,18 @@ function RegistroReporte() {
     fecha: today,
     nombreProduccion: '',
     cantidad: '0',
-    cts: '0',
+    ct: '0', // corregido aquí
     baldes: '0',
     galones: '0',
   });
 
   const [estadoConexion, setEstadoConexion] = useState('Verificando conexión...');
+  const [alerta, setAlerta] = useState(null);
 
   useEffect(() => {
+   
     const verificarConexion = async () => {
       const { error } = await supabase.from('reporte').select('*').limit(1);
-
       if (error) {
         console.error('❌ Error de conexión a Supabase:', error.message);
         setEstadoConexion('❌ No conectado a Supabase');
@@ -27,7 +37,6 @@ function RegistroReporte() {
         setEstadoConexion('✅ Conectado a Supabase');
       }
     };
-
     verificarConexion();
   }, []);
 
@@ -43,22 +52,21 @@ function RegistroReporte() {
         fecha: formulario.fecha,
         nombreProduccion: formulario.nombreProduccion,
         cantidad: parseInt(formulario.cantidad || '0'),
-        ct: parseInt(formulario.cts || '0'),
+        ct: parseInt(formulario.ct || '0'), // corregido aquí
         baldes: parseInt(formulario.baldes || '0'),
         galones: parseInt(formulario.galones || '0')
       }]);
 
     if (error) {
-      console.error('Error al insertar reporte:', error);
-      alert('❌ Error al guardar el reporte.');
+      console.error('❌ Error al insertar reporte:', error);
+      setAlerta({ tipo: 'error', mensaje: 'Error al guardar el reporte.' });
     } else {
-      alert('✅ Reporte registrado correctamente.');
-
+      setAlerta({ tipo: 'success', mensaje: 'Reporte registrado correctamente.' });
       setFormulario({
         fecha: today,
         nombreProduccion: '',
         cantidad: '0',
-        cts: '0',
+        ct: '0', // corregido aquí
         baldes: '0',
         galones: '0',
       });
@@ -66,80 +74,94 @@ function RegistroReporte() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Registro de Reporte</h1>
-      <p>Formulario para registrar un nuevo reporte.</p>
+    <Box sx={{ padding: 3 }}>
+      <Paper sx={{ padding: 3, maxWidth: 600, margin: 'auto' }}>
+        <Typography variant="h5" gutterBottom>Registro de Reporte</Typography>
+        <Typography variant="body2" gutterBottom><strong>Estado Supabase:</strong> {estadoConexion}</Typography>
 
-      <p><strong>Estado Supabase:</strong> {estadoConexion}</p>
+        {alerta && (
+          <Alert severity={alerta.tipo} sx={{ mb: 2 }}>
+            {alerta.mensaje}
+          </Alert>
+        )}
 
-      <form>
-        <div>
-          <label>Fecha:</label><br />
-          <input
-            type="date"
-            name="fecha"
-            value={formulario.fecha}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              type="date"
+              name="fecha"
+              label="Fecha"
+              InputLabelProps={{ shrink: true }}
+              value={formulario.fecha}
+              onChange={handleChange}
+            />
+          </Grid>
 
-        <div>
-          <label>Nombre del producto:</label><br />
-          <input
-            type="text"
-            name="nombreProduccion"
-            value={formulario.nombreProduccion}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Nombre del producto"
+              name="nombreProduccion"
+              value={formulario.nombreProduccion}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
 
-        <div>
-          <label>Cantidad:</label><br />
-          <input
-            type="number"
-            name="cantidad"
-            value={formulario.cantidad}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Cantidad"
+              name="cantidad"
+              value={formulario.cantidad}
+              onChange={handleChange}
+              required
+            />
+          </Grid>
 
-        <div>
-          <label>CTS:</label><br />
-          <input
-            type="number"
-            name="cts"
-            value={formulario.cts}
-            onChange={handleChange}
-          />
-        </div>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              type="number"
+              label="CT"
+              name="ct" // corregido aquí
+              value={formulario.ct}
+              onChange={handleChange}
+            />
+          </Grid>
 
-        <div>
-          <label>Baldes:</label><br />
-          <input
-            type="number"
-            name="baldes"
-            value={formulario.baldes}
-            onChange={handleChange}
-          />
-        </div>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Baldes"
+              name="baldes"
+              value={formulario.baldes}
+              onChange={handleChange}
+            />
+          </Grid>
 
-        <div>
-          <label>Galones:</label><br />
-          <input
-            type="number"
-            name="galones"
-            value={formulario.galones}
-            onChange={handleChange}
-          />
-        </div>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              type="number"
+              label="Galones"
+              name="galones"
+              value={formulario.galones}
+              onChange={handleChange}
+            />
+          </Grid>
 
-        <br />
-        <button type="button" onClick={handleSubmit}>Registrar</button>
-      </form>
-    </div>
+          <Grid item xs={12}>
+            <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+              Registrar
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
+    </Box>
   );
 }
 
