@@ -9,13 +9,14 @@ import {
   Box,
   Alert
 } from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import Navbar from '../Components/NavBar';
 function RegistroReporte() {
   const today = new Date().toISOString().split('T')[0];
 
   const [formulario, setFormulario] = useState({
     fecha: today,
-    nombreProduccion: '',
+    nombreProduccion: 'Agua Preparada',
     cantidad: '0',
     ct: '0', // corregido aquí
     baldes: '0',
@@ -92,14 +93,26 @@ function RegistroReporte() {
           
 
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Nombre del producto"
+            <InputLabel id="nombreProduccion-label">Nombre del producto</InputLabel>
+            <Select
+              labelId="nombreProduccion-label"
               name="nombreProduccion"
               value={formulario.nombreProduccion}
+              label="Nombre del producto"
               onChange={handleChange}
-              required
-            />
+            >
+              <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
+              
+              <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
+              <MenuItem value="Granotex Blanco">Granotex Blanco</MenuItem>
+              <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
+              <MenuItem value="Granotex Arena">Granotex Arena</MenuItem>
+              <MenuItem value="Relleno Fino ">Relleno Fino</MenuItem>
+              <MenuItem value="Relleno Grueso ">Relleno Grueso</MenuItem>
+              <MenuItem value="Mastik">Mastik</MenuItem>
+              <MenuItem value="Estuco Interno">Estuco Interno</MenuItem>
+              <MenuItem value="Estuco Externo">Estuco Externo</MenuItem>
+            </Select>
           </Grid>
 
           <Grid item xs={12} sm={6}>
