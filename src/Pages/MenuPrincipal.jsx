@@ -1,9 +1,10 @@
 import React from 'react'
-
+import Navbar from '../Components/NavBar';
 function MenuPrincipal() {
     return (
         <div>
-            <h1>Menú Principal</h1>
+            <Navbar title="Menú Principal" />
+            
             
         </div>  
     );

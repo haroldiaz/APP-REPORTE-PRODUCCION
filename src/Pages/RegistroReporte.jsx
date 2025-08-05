@@ -9,7 +9,7 @@ import {
   Box,
   Alert
 } from '@mui/material';
-
+import Navbar from '../Components/NavBar';
 function RegistroReporte() {
   const today = new Date().toISOString().split('T')[0];
 
@@ -74,9 +74,11 @@ function RegistroReporte() {
   };
 
   return (
+    <>   <Navbar title="Registro de Reporte" />
     <Box sx={{ padding: 3 }}>
+     
       <Paper sx={{ padding: 3, maxWidth: 600, margin: 'auto' }}>
-        <Typography variant="h5" gutterBottom>Registro de Reporte</Typography>
+       
         <Typography variant="body2" gutterBottom><strong>Estado Supabase:</strong> {estadoConexion}</Typography>
         <Typography variant="body2" gutterBottom><strong>Fecha : {today}</strong> </Typography>
 
@@ -153,6 +155,7 @@ function RegistroReporte() {
         </Grid>
       </Paper>
     </Box>
+    </>
   );
 }
 
