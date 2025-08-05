@@ -9,7 +9,7 @@ import {
   Box,
   Alert
 } from '@mui/material';
-import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Select, MenuItem, InputLabel } from '@mui/material';
 import Navbar from '../Components/NavBar';
 function RegistroReporte() {
   const today = new Date().toISOString().split('T')[0];
