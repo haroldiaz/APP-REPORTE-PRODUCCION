@@ -78,6 +78,7 @@ function RegistroReporte() {
       <Paper sx={{ padding: 3, maxWidth: 600, margin: 'auto' }}>
         <Typography variant="h5" gutterBottom>Registro de Reporte</Typography>
         <Typography variant="body2" gutterBottom><strong>Estado Supabase:</strong> {estadoConexion}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Fecha : {today}</strong> </Typography>
 
         {alerta && (
           <Alert severity={alerta.tipo} sx={{ mb: 2 }}>
@@ -85,18 +86,8 @@ function RegistroReporte() {
           </Alert>
         )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              type="date"
-              name="fecha"
-              label="Fecha"
-              InputLabelProps={{ shrink: true }}
-              value={formulario.fecha}
-              onChange={handleChange}
-            />
-          </Grid>
+        <Grid container spacing={2} sx={{ marginTop: 4 }}>
+          
 
           <Grid item xs={12}>
             <TextField
