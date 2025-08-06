@@ -98,7 +98,19 @@ function VerReporteProduccion() {
             <TableBody>
               {reportes.map((reporte) => (
                 <TableRow key={reporte.id}>
-                  <TableCell>{reporte.fecha}</TableCell>
+                  <TableCell>
+                    {editandoId === reporte.id ? (
+                      <TextField
+                        type="date"
+                        name="fecha"
+                        value={formulario.fecha ? formulario.fecha.slice(0, 10) : ''}
+                        onChange={handleChange}
+                        size="small"
+                      />
+                    ) : (
+                      new Date(reporte.fecha).toLocaleDateString()
+                    )}
+                  </TableCell>
 
                   {editandoId === reporte.id ? (
                     <>

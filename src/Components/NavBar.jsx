@@ -80,7 +80,8 @@ export default function Navbar({ open, setOpen }) {
           { text: 'Menú Principal', icon: <HomeIcon />, route: '/' },
           { text: 'Tabla Reporte', icon: <EventNoteIcon />, route: '/VerReporte' },
           { text: 'Registro Reporte', icon: <AddCircleOutlineIcon />, route: '/HacerReporte' },
-          { text: 'Estadísticas', icon: <InsertChartIcon />, route: '/Estadisticas' }
+          { text: 'Estadísticas', icon: <InsertChartIcon />, route: '/Estadisticas' },
+          { text: 'Graficos', icon: <InsertChartIcon />, route: '/Graficos' }
         ].map(({ text, icon, route }) => (
           <ListItem disablePadding key={text}>
             <Tooltip title={!open ? text : ''} placement="right">

@@ -7,6 +7,7 @@ import MenuPrincipal from './Pages/MenuPrincipal';
 import Estadisticas from './Pages/Estadisticas';
 import Navbar from './Components/NavBar';
 import { Box } from '@mui/material';
+import Graficos from './Pages/Graficos';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 70;
@@ -35,6 +36,7 @@ function App() {
             <Route path="/HacerReporte" element={<RegistroReporte />} />
             <Route path="/VerReporte" element={<VerReporteProduccion />} />
             <Route path="/Estadisticas" element={<Estadisticas />} />
+            <Route path="/Graficos" element={<Graficos />} />
           </Routes>
         </Box>
       </Box>
