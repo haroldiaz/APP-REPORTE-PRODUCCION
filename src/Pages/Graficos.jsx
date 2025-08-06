@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../Components/supabaseClient';
 import Navbar from '../Components/NavBar';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
-import { CircularProgress, Typography, Box, Paper, Grid } from '@mui/material';
+import {
+  CircularProgress, Typography, Box, Paper, Stack
+} from '@mui/material';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#BA68C8', '#EF5350', '#26A69A', '#FFA726'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F', '#FFBB28'];
 
 function Graficos() {
   const [data, setData] = useState([]);
-  const [pieData, setPieData] = useState([]);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
@@ -26,96 +27,140 @@ function Graficos() {
         return;
       }
 
-      // Producción por día para el gráfico de barras
-      const produccionPorDia = {};
-      // Producción por producto para el gráfico de pastel
-      const produccionPorProducto = {};
-
-      for (const item of reportes) {
-        const fecha = new Date(item.fecha);
-        const fechaStr = fecha.toISOString().split('T')[0]; // formato YYYY-MM-DD
-        produccionPorDia[fechaStr] = (produccionPorDia[fechaStr] || 0) + (item.ct || 0);
-
-        const nombre = item.nombreProduccion || 'Desconocido';
-        produccionPorProducto[nombre] = (produccionPorProducto[nombre] || 0) + (item.ct || 0);
-      }
-
-      const datosBarras = Object.keys(produccionPorDia).map((fecha) => ({
-        fecha,
-        ct: produccionPorDia[fecha]
-      })).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-
-      const datosPastel = Object.keys(produccionPorProducto).map((nombre) => ({
-        name: nombre,
-        value: produccionPorProducto[nombre]
-      }));
-
-      setData(datosBarras);
-      setPieData(datosPastel);
+      setData(reportes);
       setCargando(false);
     };
 
     cargarDatos();
   }, []);
 
+  // Agrupación por fecha (para barras)
+  const datosBarras = (() => {
+    const porDia = {};
+    for (const item of data) {
+      const fecha = new Date(item.fecha).toISOString().split('T')[0];
+      porDia[fecha] = (porDia[fecha] || 0) + (item.ct || 0);
+    }
+    return Object.entries(porDia).map(([fecha, ct]) => ({ fecha, ct }));
+  })();
+
+  // Agrupación por producto (para pastel)
+  const datosPastel = (() => {
+    const porProducto = {};
+    for (const item of data) {
+      const producto = item.nombreProduccion;
+      porProducto[producto] = (porProducto[producto] || 0) + (item.ct || 0);
+    }
+    return Object.entries(porProducto).map(([nombre, ct]) => ({ name: nombre, value: ct }));
+  })();
+
+  // Agrupación por fecha y producto (para líneas)
+  const datosLineas = (() => {
+    const agrupado = {};
+    for (const item of data) {
+      const fecha = new Date(item.fecha).toISOString().split('T')[0];
+      const producto = item.nombreProduccion;
+      const ct = item.ct || 0;
+
+      if (!agrupado[fecha]) {
+        agrupado[fecha] = { fecha };
+      }
+      agrupado[fecha][producto] = (agrupado[fecha][producto] || 0) + ct;
+    }
+    return Object.values(agrupado).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  })();
+
+  const clavesProductos = (() => {
+    const setProductos = new Set();
+    data.forEach(item => setProductos.add(item.nombreProduccion));
+    return Array.from(setProductos);
+  })();
+
   return (
     <div>
-     
-
+      
       <Box p={4}>
-        <Grid container spacing={4}>
+        <Stack spacing={4}>
           {/* Gráfico de barras */}
-          <Grid item xs={12} md={6}>
-            <Paper elevation={4} style={{ padding: '10px' }}>
-              <Typography variant="h6" gutterBottom>
-                Producción diaria (CT por día)
-              </Typography>
-              {cargando ? (
-                <CircularProgress />
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="fecha" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="ct" fill="#1976d2" />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </Paper>
-          </Grid>
+          <Paper elevation={4} style={{ padding: '10px', width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Producción total por día
+            </Typography>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={datosBarras}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="fecha" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="ct" fill="#1976d2" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
 
           {/* Gráfico de pastel */}
-          <Grid item xs={12} md={6}>
-            <Paper elevation={4} style={{ padding: '10px' }}>
-              <Typography variant="h6" gutterBottom>
-                Producción total por producto
-              </Typography>
-              {cargando ? (
-                <CircularProgress />
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      outerRadius={100}
-                      label
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
-            </Paper>
-          </Grid>
-        </Grid>
+          <Paper elevation={4} style={{ padding: '10px', width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Producción total por producto
+            </Typography>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={datosPastel}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label
+                  >
+                    {datosPastel.map((_, index) => (
+                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+
+          {/* Gráfico de líneas */}
+          <Paper elevation={4} style={{ padding: '10px', width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Evolución diaria por producto
+            </Typography>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={datosLineas}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="fecha" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  {clavesProductos.map((producto, index) => (
+                    <Line
+                      key={producto}
+                      type="monotone"
+                      dataKey={producto}
+                      stroke={COLORS[index % COLORS.length]}
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+        </Stack>
       </Box>
     </div>
   );
