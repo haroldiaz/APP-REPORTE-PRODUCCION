@@ -17,7 +17,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { useNavigate } from 'react-router-dom';
 
 export default function Navbar({ title = "APP GYM" }) {
@@ -84,9 +84,9 @@ export default function Navbar({ title = "APP GYM" }) {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNav('/VerEntrenadores')}>
-                <ListItemIcon><PictureAsPdfIcon /></ListItemIcon>
-                <ListItemText primary="VerEntrenadores" />
+              <ListItemButton onClick={() => handleNav('/Estadisticas')}>
+                <ListItemIcon><InsertChartIcon /></ListItemIcon>
+                <ListItemText primary="Estadisticas" />
               </ListItemButton>
             </ListItem>
              
