@@ -18,6 +18,8 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 
 function Estadisticas() {
+const drawerWidthOpen = 240;
+const drawerWidthClosed = 70;
   const [data, setData] = useState([]);
   const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth());
   const [mesComparar1, setMesComparar1] = useState(0);
@@ -27,7 +29,7 @@ function Estadisticas() {
   const [ctComparar1, setCtComparar1] = useState(0);
   const [ctComparar2, setCtComparar2] = useState(0);
   const [productoMenosProducido, setProductoMenosProducido] = useState(null);
-
+const [drawerOpen, setDrawerOpen] = useState(true);
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -104,7 +106,7 @@ function Estadisticas() {
 
   return (
     <div>
-      <Navbar title="Estadísticas" />
+      <Navbar open={drawerOpen} setOpen={setDrawerOpen} />
       <Box p={3}>
         <Grid container spacing={3} justifyContent="center">
           {/* Card 1: Total de un solo mes */}

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../Components/NavBar';
 import { supabase } from '../Components/supabaseClient';
 import {
   Card,
@@ -11,7 +10,10 @@ import {
 } from '@mui/material';
 
 function MenuPrincipal() {
+  const [data, setData] = useState([]);
   const [totalCT, setTotalCT] = useState(0);
+  const [totalHoy, setTotalHoy] = useState(0);
+  const [totalMes, setTotalMes] = useState(0);
   const [productoTop, setProductoTop] = useState(null);
   const [cargando, setCargando] = useState(true);
 
@@ -27,103 +29,164 @@ function MenuPrincipal() {
         return;
       }
 
-      const sumaTotal = data.reduce((acc, curr) => acc + (curr.ct || 0), 0);
-      setTotalCT(sumaTotal);
-
-      const hoy = new Date();
-      const mesActual = hoy.getMonth();
-      const añoActual = hoy.getFullYear();
-
-      const reportesEsteMes = data.filter(item => {
-        const fecha = new Date(item.fecha);
-        return (
-          fecha.getMonth() === mesActual &&
-          fecha.getFullYear() === añoActual
-        );
-      });
-
-      const produccionPorProducto = {};
-      for (const item of reportesEsteMes) {
-        const nombre = item.nombreProduccion;
-        const ct = item.ct || 0;
-        if (!produccionPorProducto[nombre]) {
-          produccionPorProducto[nombre] = 0;
-        }
-        produccionPorProducto[nombre] += ct;
-      }
-
-      let topProducto = null;
-      let maxCT = 0;
-      for (const nombre in produccionPorProducto) {
-        if (produccionPorProducto[nombre] > maxCT) {
-          topProducto = {
-            nombre,
-            total: produccionPorProducto[nombre]
-          };
-          maxCT = produccionPorProducto[nombre];
-        }
-      }
-
-      setProductoTop(topProducto);
-      setCargando(false);
+      setData(data);
     };
 
     obtenerDatos();
   }, []);
 
+  useEffect(() => {
+    if (data.length === 0) return;
+
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const añoActual = hoy.getFullYear();
+    const diaActual = hoy.getDate();
+
+    let sumaTotal = 0;
+    let sumaHoy = 0;
+    let sumaMes = 0;
+
+    const produccionPorProducto = {};
+
+    for (const item of data) {
+      const ct = item.ct || 0;
+      sumaTotal += ct;
+
+      const fecha = new Date(item.fecha);
+      const esMismoAño = fecha.getFullYear() === añoActual;
+      const esMismoMes = fecha.getMonth() === mesActual;
+      const esMismoDia = fecha.getDate() === diaActual;
+
+      if (esMismoAño && esMismoMes) {
+        sumaMes += ct;
+
+        const nombre = item.nombreProduccion;
+        produccionPorProducto[nombre] = (produccionPorProducto[nombre] || 0) + ct;
+      }
+
+      if (esMismoAño && esMismoMes && esMismoDia) {
+        sumaHoy += ct;
+      }
+    }
+
+    let topProducto = null;
+    let maxCT = 0;
+    for (const nombre in produccionPorProducto) {
+      if (produccionPorProducto[nombre] > maxCT) {
+        topProducto = {
+          nombre,
+          total: produccionPorProducto[nombre]
+        };
+        maxCT = produccionPorProducto[nombre];
+      }
+    }
+
+    setTotalCT(sumaTotal);
+    setTotalHoy(sumaHoy);
+    setTotalMes(sumaMes);
+    setProductoTop(topProducto);
+    setCargando(false);
+  }, [data]);
+
   return (
-    <div>
-      <Navbar title="Menú Principal" />
-
-      <Box p={3} display="flex" justifyContent="center">
-        <Grid container spacing={3} justifyContent="center" maxWidth="md">
-          {/* Card total CT */}
-          <Grid item xs={12} sm={6}>
-            <Card elevation={3} style={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  Reporte Mensual
+    <Box
+       sx={{
+        height: '100%', // toda la altura de la pantalla
+        display: 'flex',
+        justifyContent: 'center',  // centra horizontalmente
+        alignItems: 'center',      // centra verticalmente
+        backgroundColor: '#f5f5f5', // color de fondo claro
+        p: 4,
+    }}
+    >
+        <Grid
+  container
+  spacing={4}
+  justifyContent="center"   // centra horizontalmente
+  alignItems="center"       // centra verticalmente
+  sx={{ maxWidth: 1000 }}
+>
+        {/* Total General */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={3} style={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Total General
+              </Typography>
+              {cargando ? (
+                <CircularProgress />
+              ) : (
+                <Typography variant="body1">
+                  <strong>CT:</strong> {totalCT}
                 </Typography>
-                {cargando ? (
-                  <CircularProgress />
-                ) : (
-                  <Typography variant="body1">
-                    <strong>Total de CTS producidos:</strong> {totalCT}
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Card producto más producido */}
-          <Grid item xs={12} sm={6}>
-            <Card elevation={3} style={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  Producto más producido este mes
-                </Typography>
-                {cargando ? (
-                  <CircularProgress />
-                ) : productoTop ? (
-                  <>
-                    <Typography variant="body1">
-                      <strong>Producto:</strong> {productoTop.nombre}
-                    </Typography>
-                    <Typography variant="body1">
-                      <strong>Total CT:</strong> {productoTop.total}
-                    </Typography>
-                  </>
-                ) : (
-                  <Typography variant="body1">
-                    No hay datos de este mes.
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+              )}
+            </CardContent>
+          </Card>
         </Grid>
-      </Box>
-    </div>
+
+        {/* Total Mes Actual */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={3} style={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Total Mes Actual
+              </Typography>
+              {cargando ? (
+                <CircularProgress />
+              ) : (
+                <Typography variant="body1">
+                  <strong>CT:</strong> {totalMes}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Total Hoy */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={3} style={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Total Hoy
+              </Typography>
+              {cargando ? (
+                <CircularProgress />
+              ) : (
+                <Typography variant="body1">
+                  <strong>CT:</strong> {totalHoy}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Producto más producido */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={3} style={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Producto más producido este mes
+              </Typography>
+              {cargando ? (
+                <CircularProgress />
+              ) : productoTop ? (
+                <>
+                  <Typography variant="body1">
+                    <strong>Producto:</strong> {productoTop.nombre}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Total CT:</strong> {productoTop.total}
+                  </Typography>
+                </>
+              ) : (
+                <Typography>No hay datos de este mes.</Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 

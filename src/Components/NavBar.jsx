@@ -1,100 +1,97 @@
 // src/Componentes/Navbar.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
   Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Box
+  Box,
+  Avatar,
+  Divider,
+  IconButton,
+  Typography,
+  Tooltip
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import HomeIcon from '@mui/icons-material/Home';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { useNavigate } from 'react-router-dom';
 
-export default function Navbar({ title = "APP GYM" }) {
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+const drawerWidthOpen = 240;
+const drawerWidthClosed = 70;
 
-  const toggleDrawer = (open) => () => {
-    setOpen(open);
-  };
+export default function Navbar({ open, setOpen }) {
+  const navigate = useNavigate();
 
   const handleNav = (ruta) => {
     navigate(ruta);
-    setOpen(false); // cerrar menú al navegar
   };
 
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          {/* Botón del menú tipo Gmail */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={toggleDrawer(true)}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: open ? drawerWidthOpen : drawerWidthClosed,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: open ? drawerWidthOpen : drawerWidthClosed,
+          transition: 'width 0.3s',
+          overflowX: 'hidden',
+          boxSizing: 'border-box',
+        },
+      }}
+    >
+      {/* Encabezado del Drawer con botón abrir/cerrar */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: open ? 'space-between' : 'center',
+          padding: 1.5,
+          backgroundColor: '#1976d2',
+          color: 'white',
+          height: '64px'
+        }}
+      >
+        {open && (
+          <Box display="flex" alignItems="center">
+            <Avatar sx={{ bgcolor: 'white', color: '#1976d2', mr: 4 }}>P</Avatar>
+            <Typography variant="subtitle1" fontWeight="bold">
+             Produccion Manager
+            </Typography>
+          </Box>
+        )}
 
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {title}
-          </Typography>
-        </Toolbar>
-      </AppBar>
+        <IconButton onClick={() => setOpen(!open)} sx={{ color: 'white' }}>
+          {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
+      </Box>
 
-      {/* Drawer lateral */}
-      <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
-        <Box
-          sx={{ width: 250 }}
-          role="presentation"
-          onClick={toggleDrawer(false)}
-          onKeyDown={toggleDrawer(false)}
-        >
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNav('/')}>
-                <ListItemIcon><HomeIcon /></ListItemIcon>
-                <ListItemText primary="Menu Principal" />
+      <Divider />
+
+      {/* Lista de navegación */}
+      <List>
+        {[
+          { text: 'Menú Principal', icon: <HomeIcon />, route: '/' },
+          { text: 'Tabla Reporte', icon: <EventNoteIcon />, route: '/VerReporte' },
+          { text: 'Registro Reporte', icon: <AddCircleOutlineIcon />, route: '/HacerReporte' },
+          { text: 'Estadísticas', icon: <InsertChartIcon />, route: '/Estadisticas' }
+        ].map(({ text, icon, route }) => (
+          <ListItem disablePadding key={text}>
+            <Tooltip title={!open ? text : ''} placement="right">
+              <ListItemButton onClick={() => handleNav(route)}>
+                <ListItemIcon>{icon}</ListItemIcon>
+                {open && <ListItemText primary={text} />}
               </ListItemButton>
-            </ListItem>
-
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNav('/VerReporte')}>
-                <ListItemIcon><EventNoteIcon /></ListItemIcon>
-                <ListItemText primary="Tabla Reporte" />
-              </ListItemButton>
-            </ListItem>
-
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNav('/HacerReporte')}>
-                <ListItemIcon><AddCircleOutlineIcon /></ListItemIcon>
-                <ListItemText primary="Registro Reporte" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNav('/Estadisticas')}>
-                <ListItemIcon><InsertChartIcon /></ListItemIcon>
-                <ListItemText primary="Estadisticas" />
-              </ListItemButton>
-            </ListItem>
-             
-
-            {/* Puedes seguir agregando más ítems aquí */}
-          </List>
-        </Box>
-      </Drawer>
-    </>
+            </Tooltip>
+          </ListItem>
+        ))}
+      </List>
+    </Drawer>
   );
 }

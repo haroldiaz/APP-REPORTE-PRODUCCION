@@ -79,7 +79,7 @@ function RegistroReporte() {
 
   return (
     <>
-      <Navbar title="Registro de Reporte" />
+     
       <Box sx={{ padding: 3 }}>
         <Paper sx={{ padding: 3, maxWidth: 600, margin: 'auto' }}>
           <Typography variant="body2" gutterBottom>
