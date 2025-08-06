@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 
 function Estadisticas() {
   const [data, setData] = useState([]);
@@ -25,6 +26,7 @@ function Estadisticas() {
   const [ctMes, setCtMes] = useState(0);
   const [ctComparar1, setCtComparar1] = useState(0);
   const [ctComparar2, setCtComparar2] = useState(0);
+  const [productoMenosProducido, setProductoMenosProducido] = useState(null);
 
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -35,7 +37,7 @@ function Estadisticas() {
     const obtenerDatos = async () => {
       const { data, error } = await supabase
         .from('reporte')
-        .select('ct, fecha');
+        .select('ct, fecha, nombreProduccion');
 
       if (error) {
         console.error('❌ Error al obtener datos:', error.message);
@@ -66,9 +68,38 @@ function Estadisticas() {
         })
         .reduce((acc, curr) => acc + (curr.ct || 0), 0);
 
+    const datosMes = data.filter(item => {
+      const fecha = new Date(item.fecha);
+      return (
+        fecha.getFullYear() === añoActual &&
+        fecha.getMonth() === mesSeleccionado
+      );
+    });
+
+    const produccionPorProducto = {};
+    for (const item of datosMes) {
+      const nombre = item.nombreProduccion;
+      const ct = item.ct || 0;
+      produccionPorProducto[nombre] = (produccionPorProducto[nombre] || 0) + ct;
+    }
+
+    let minCT = Infinity;
+    let productoMenos = null;
+    for (const nombre in produccionPorProducto) {
+      if (produccionPorProducto[nombre] < minCT) {
+        minCT = produccionPorProducto[nombre];
+        productoMenos = {
+          nombre,
+          total: produccionPorProducto[nombre]
+        };
+      }
+    }
+
     setCtMes(totalMes(mesSeleccionado));
     setCtComparar1(totalMes(mesComparar1));
     setCtComparar2(totalMes(mesComparar2));
+    setProductoMenosProducido(productoMenos);
+
   }, [mesSeleccionado, mesComparar1, mesComparar2, data]);
 
   return (
@@ -76,12 +107,11 @@ function Estadisticas() {
       <Navbar title="Estadísticas" />
       <Box p={3}>
         <Grid container spacing={3} justifyContent="center">
-          
           {/* Card 1: Total de un solo mes */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <Card elevation={3}>
               <CardContent>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   <InsertChartIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                   CT producidos por mes
                 </Typography>
@@ -90,7 +120,7 @@ function Estadisticas() {
                   <CircularProgress />
                 ) : (
                   <>
-                    <FormControl fullWidth sx={{ mt: 2, mb: 3 }}>
+                    <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
                       <InputLabel id="mes-label">Selecciona un mes</InputLabel>
                       <Select
                         labelId="mes-label"
@@ -116,10 +146,10 @@ function Estadisticas() {
           </Grid>
 
           {/* Card 2: Comparar dos meses */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <Card elevation={3}>
               <CardContent>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   <CompareArrowsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                   Comparar Meses
                 </Typography>
@@ -128,7 +158,6 @@ function Estadisticas() {
                   <CircularProgress />
                 ) : (
                   <>
-                    {/* Mes 1 */}
                     <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
                       <InputLabel id="mes1-label">Mes 1</InputLabel>
                       <Select
@@ -145,7 +174,6 @@ function Estadisticas() {
                       </Select>
                     </FormControl>
 
-                    {/* Mes 2 */}
                     <FormControl fullWidth sx={{ mb: 3 }}>
                       <InputLabel id="mes2-label">Mes 2</InputLabel>
                       <Select
@@ -162,7 +190,6 @@ function Estadisticas() {
                       </Select>
                     </FormControl>
 
-                    {/* Resultados */}
                     <Typography variant="body1" gutterBottom>
                       <strong>{meses[mesComparar1]}:</strong> {ctComparar1} CT
                     </Typography>
@@ -170,6 +197,33 @@ function Estadisticas() {
                       <strong>{meses[mesComparar2]}:</strong> {ctComparar2} CT
                     </Typography>
                   </>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Card 3: Producto menos producido */}
+          <Grid item xs={12} md={4}>
+            <Card elevation={3}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <TrendingDownIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Producto menos producido ({meses[mesSeleccionado]})
+                </Typography>
+
+                {cargando ? (
+                  <CircularProgress />
+                ) : productoMenosProducido ? (
+                  <>
+                    <Typography variant="body1">
+                      <strong>Producto:</strong> {productoMenosProducido.nombre}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Total CT:</strong> {productoMenosProducido.total}
+                    </Typography>
+                  </>
+                ) : (
+                  <Typography>No hay datos para este mes.</Typography>
                 )}
               </CardContent>
             </Card>
