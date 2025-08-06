@@ -10,7 +10,6 @@ import {
   Alert
 } from '@mui/material';
 import { Select, MenuItem, InputLabel } from '@mui/material';
-import Navbar from '../Components/NavBar';
 
 function RegistroReporte() {
   const [formulario, setFormulario] = useState({

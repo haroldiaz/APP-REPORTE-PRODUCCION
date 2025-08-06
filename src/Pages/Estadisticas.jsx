@@ -18,8 +18,7 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 
 function Estadisticas() {
-const drawerWidthOpen = 240;
-const drawerWidthClosed = 70;
+
   const [data, setData] = useState([]);
   const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth());
   const [mesComparar1, setMesComparar1] = useState(0);
