@@ -7,13 +7,15 @@ import {
   Typography,
   Paper,
   Box,
-  Alert
+  Alert,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
-import { Select, MenuItem, InputLabel } from '@mui/material';
 
 function RegistroReporte() {
   const [formulario, setFormulario] = useState({
-    fecha: '', // No usamos fecha predefinida
+    fecha: '',
     nombreProduccion: 'Agua Preparada',
     cantidad: '0',
     ct: '0',
@@ -44,7 +46,6 @@ function RegistroReporte() {
   };
 
   const handleSubmit = async () => {
-    // Capturar fecha en el momento del registro
     const fechaActual = new Date().toISOString().split('T')[0];
 
     const { error } = await supabase
@@ -63,8 +64,6 @@ function RegistroReporte() {
       setAlerta({ tipo: 'error', mensaje: 'Error al guardar el reporte.' });
     } else {
       setAlerta({ tipo: 'success', mensaje: 'Reporte registrado correctamente.' });
-
-      // Resetear formulario, con nueva fecha fija
       setFormulario({
         fecha: fechaActual,
         nombreProduccion: '',
@@ -77,35 +76,62 @@ function RegistroReporte() {
   };
 
   return (
-    <>
-     
-      <Box sx={{ padding: 3 }}>
-        <Paper sx={{ padding: 3, maxWidth: 600, margin: 'auto' }}>
-          <Typography variant="body2" gutterBottom>
+    <Box
+      sx={{
+        p: 2,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f5f5f5',
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          width: '100%',
+          maxWidth: 500,
+          p: 4,
+          boxSizing: 'border-box',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2, // espacio entre los elementos
+          }}
+        >
+          <Typography variant="h6" align="center">
+            Registro de Reporte
+          </Typography>
+
+          <Typography variant="body2" align="center">
             <strong>Estado Supabase:</strong> {estadoConexion}
           </Typography>
 
           {formulario.fecha && (
-            <Typography variant="body2" gutterBottom>
+            <Typography variant="body2" align="center">
               <strong>Fecha del último registro:</strong> {formulario.fecha}
             </Typography>
           )}
 
           {alerta && (
-            <Alert severity={alerta.tipo} sx={{ mb: 2 }}>
+            <Alert severity={alerta.tipo} sx={{ width: '100%' }}>
               {alerta.mensaje}
             </Alert>
           )}
 
-          <Grid container spacing={2} sx={{ marginTop: 4 }}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <InputLabel id="nombreProduccion-label">Nombre del producto</InputLabel>
               <Select
                 labelId="nombreProduccion-label"
                 name="nombreProduccion"
                 value={formulario.nombreProduccion}
-                label="Nombre del producto"
                 onChange={handleChange}
+                fullWidth
               >
                 <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
                 <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
@@ -166,14 +192,19 @@ function RegistroReporte() {
             </Grid>
 
             <Grid item xs={12}>
-              <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmit}
+              >
                 Registrar
               </Button>
             </Grid>
           </Grid>
-        </Paper>
-      </Box>
-    </>
+        </Box>
+      </Paper>
+    </Box>
   );
 }
 

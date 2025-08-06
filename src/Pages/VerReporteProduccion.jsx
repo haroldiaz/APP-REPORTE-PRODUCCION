@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from './../Components/supabaseClient';
 import {
   Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Typography, Button, TextField, Select, MenuItem
+  TableHead, TableRow, Paper, Typography, Button,
+  TextField, Select, MenuItem, Box
 } from '@mui/material';
 
 function VerReporteProduccion() {
@@ -74,15 +75,24 @@ function VerReporteProduccion() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 2,
+        minHeight: '100vh',
+        backgroundColor: '#f5f5f5',
+      }}
+    >
       <Typography variant="h4" gutterBottom>
         Ver Reporte de Producción
       </Typography>
 
       {cargando ? (
-        <p>Cargando reportes...</p>
+        <Typography variant="body1">Cargando reportes...</Typography>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ width: '90%', maxWidth: 1000 }}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -185,7 +195,7 @@ function VerReporteProduccion() {
                           color="primary"
                           size="small"
                           onClick={() => comenzarEdicion(reporte)}
-                          style={{ marginRight: 8 }}
+                          sx={{ mr: 1 }}
                         >
                           Editar
                         </Button>
@@ -213,7 +223,7 @@ function VerReporteProduccion() {
           </Table>
         </TableContainer>
       )}
-    </div>
+    </Box>
   );
 }
 
