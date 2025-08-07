@@ -3,14 +3,16 @@ import { supabase } from './../Components/supabaseClient';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Typography, Button,
-  TextField, Select, MenuItem, Box
+  TextField, Select, MenuItem, Box, Grid
 } from '@mui/material';
 
 function VerReporteProduccion() {
   const [reportes, setReportes] = useState([]);
+  const [reportesFiltrados, setReportesFiltrados] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [editandoId, setEditandoId] = useState(null);
   const [formulario, setFormulario] = useState({});
+  const [filtros, setFiltros] = useState({ fecha: '', nombreProduccion: '' });
 
   useEffect(() => {
     const obtenerReportes = async () => {
@@ -23,12 +25,36 @@ function VerReporteProduccion() {
         console.error('Error al obtener reportes:', error.message);
       } else {
         setReportes(data);
+        setReportesFiltrados(data); // Inicialmente sin filtro
       }
       setCargando(false);
     };
 
     obtenerReportes();
   }, []);
+
+  const aplicarFiltros = () => {
+    let filtrados = [...reportes];
+
+    if (filtros.fecha) {
+      filtrados = filtrados.filter(r =>
+        r.fecha?.slice(0, 10) === filtros.fecha
+      );
+    }
+
+    if (filtros.nombreProduccion) {
+      filtrados = filtrados.filter(r =>
+        r.nombreProduccion === filtros.nombreProduccion
+      );
+    }
+
+    setReportesFiltrados(filtrados);
+  };
+
+  const limpiarFiltros = () => {
+    setFiltros({ fecha: '', nombreProduccion: '' });
+    setReportesFiltrados(reportes);
+  };
 
   const eliminarReporte = async (id) => {
     const { error } = await supabase
@@ -39,7 +65,9 @@ function VerReporteProduccion() {
     if (error) {
       console.error('Error al eliminar reporte:', error.message);
     } else {
-      setReportes((prevReportes) => prevReportes.filter(r => r.id !== id));
+      const actualizados = reportes.filter(r => r.id !== id);
+      setReportes(actualizados);
+      setReportesFiltrados(actualizados);
     }
   };
 
@@ -58,6 +86,11 @@ function VerReporteProduccion() {
     setFormulario(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    setFiltros(prev => ({ ...prev, [name]: value }));
+  };
+
   const guardarEdicion = async () => {
     const { error } = await supabase
       .from('reporte')
@@ -67,9 +100,9 @@ function VerReporteProduccion() {
     if (error) {
       console.error('Error al actualizar reporte:', error.message);
     } else {
-      setReportes(prev =>
-        prev.map(r => (r.id === editandoId ? formulario : r))
-      );
+      const actualizados = reportes.map(r => (r.id === editandoId ? formulario : r));
+      setReportes(actualizados);
+      setReportesFiltrados(actualizados);
       cancelarEdicion();
     }
   };
@@ -85,9 +118,42 @@ function VerReporteProduccion() {
         backgroundColor: '#f5f5f5',
       }}
     >
-      <Typography variant="h4" gutterBottom>
-        Ver Reporte de Producción
-      </Typography>
+      {/* Filtros */}
+      <Paper sx={{ width: '90%', maxWidth: 1000, mb: 2, p: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Filtrar por fecha"
+              type="date"
+              name="fecha"
+              value={filtros.fecha}
+              onChange={handleFiltroChange}
+              InputLabelProps={{ shrink: true }}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Select
+              fullWidth
+              name="nombreProduccion"
+              value={filtros.nombreProduccion}
+              onChange={handleFiltroChange}
+              displayEmpty
+              size="small"
+            >
+              <MenuItem value="">Todos los productos</MenuItem>
+              <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
+              <MenuItem value="Mastik">Mastik</MenuItem>
+              <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
+            </Select>
+          </Grid>
+          <Grid item xs={12} sm={4} display="flex" gap={1}>
+            <Button variant="contained" onClick={aplicarFiltros}>Filtrar</Button>
+            <Button variant="outlined" onClick={limpiarFiltros}>Limpiar</Button>
+          </Grid>
+        </Grid>
+      </Paper>
 
       {cargando ? (
         <Typography variant="body1">Cargando reportes...</Typography>
@@ -106,7 +172,7 @@ function VerReporteProduccion() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {reportes.map((reporte) => (
+              {reportesFiltrados.map((reporte) => (
                 <TableRow key={reporte.id}>
                   <TableCell>
                     {editandoId === reporte.id ? (
@@ -212,10 +278,10 @@ function VerReporteProduccion() {
                   )}
                 </TableRow>
               ))}
-              {reportes.length === 0 && (
+              {reportesFiltrados.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} align="center">
-                    No hay reportes registrados.
+                    No hay reportes que coincidan con los filtros.
                   </TableCell>
                 </TableRow>
               )}
