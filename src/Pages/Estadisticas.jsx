@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-
 import { supabase } from '../Components/supabaseClient';
 import {
   Card,
@@ -16,9 +15,9 @@ import {
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 function Estadisticas() {
-
   const [data, setData] = useState([]);
   const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth());
   const [mesComparar1, setMesComparar1] = useState(0);
@@ -28,6 +27,7 @@ function Estadisticas() {
   const [ctComparar1, setCtComparar1] = useState(0);
   const [ctComparar2, setCtComparar2] = useState(0);
   const [productoMenosProducido, setProductoMenosProducido] = useState(null);
+  const [productoMasProducido, setProductoMasProducido] = useState(null);
 
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -84,15 +84,21 @@ function Estadisticas() {
       produccionPorProducto[nombre] = (produccionPorProducto[nombre] || 0) + ct;
     }
 
+    // Producto menos y más producido
     let minCT = Infinity;
+    let maxCT = -Infinity;
     let productoMenos = null;
+    let productoMas = null;
+
     for (const nombre in produccionPorProducto) {
-      if (produccionPorProducto[nombre] < minCT) {
-        minCT = produccionPorProducto[nombre];
-        productoMenos = {
-          nombre,
-          total: produccionPorProducto[nombre]
-        };
+      const total = produccionPorProducto[nombre];
+      if (total < minCT) {
+        minCT = total;
+        productoMenos = { nombre, total };
+      }
+      if (total > maxCT) {
+        maxCT = total;
+        productoMas = { nombre, total };
       }
     }
 
@@ -100,132 +106,157 @@ function Estadisticas() {
     setCtComparar1(totalMes(mesComparar1));
     setCtComparar2(totalMes(mesComparar2));
     setProductoMenosProducido(productoMenos);
-
+    setProductoMasProducido(productoMas);
   }, [mesSeleccionado, mesComparar1, mesComparar2, data]);
 
   return (
     <div>
-      
       <Box p={3} display="flex" justifyContent="center">
-  <Grid container spacing={3} direction="column" style={{ maxWidth: 500, width: '100%' }}>
-    {/* Card 1: Total de un solo mes */}
-    <Grid item xs={12}>
-      <Card elevation={3} style={{ minHeight: '180px' }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            <InsertChartIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-            CT producidos por mes
-          </Typography>
-          {cargando ? (
-            <CircularProgress />
-          ) : (
-            <>
-              <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
-                <InputLabel id="mes-label">Selecciona un mes</InputLabel>
-                <Select
-                  labelId="mes-label"
-                  value={mesSeleccionado}
-                  label="Selecciona un mes"
-                  onChange={(e) => setMesSeleccionado(e.target.value)}
-                >
-                  {meses.map((mes, index) => (
-                    <MenuItem key={index} value={index}>
-                      {mes}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <Typography variant="body1">
-                Total de CT en <strong>{meses[mesSeleccionado]}</strong>: <strong>{ctMes}</strong>
-              </Typography>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </Grid>
+        <Grid container spacing={3} direction="column" style={{ maxWidth: 500, width: '100%' }}>
+          
+          {/* Card 1: Total de un solo mes */}
+          <Grid item xs={12}>
+            <Card elevation={3} style={{ minHeight: '180px' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <InsertChartIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  CT producidos por mes
+                </Typography>
+                {cargando ? (
+                  <CircularProgress />
+                ) : (
+                  <>
+                    <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+                      <InputLabel id="mes-label">Selecciona un mes</InputLabel>
+                      <Select
+                        labelId="mes-label"
+                        value={mesSeleccionado}
+                        label="Selecciona un mes"
+                        onChange={(e) => setMesSeleccionado(e.target.value)}
+                      >
+                        {meses.map((mes, index) => (
+                          <MenuItem key={index} value={index}>
+                            {mes}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Typography variant="body1">
+                      Total de CT en <strong>{meses[mesSeleccionado]}</strong>: <strong>{ctMes}</strong>
+                    </Typography>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
-    {/* Card 2: Comparar dos meses */}
-    <Grid item xs={12}>
-      <Card elevation={3} style={{ minHeight: '180px' }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            <CompareArrowsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-            Comparar Meses
-          </Typography>
-          {cargando ? (
-            <CircularProgress />
-          ) : (
-            <>
-              <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
-                <InputLabel id="mes1-label">Mes 1</InputLabel>
-                <Select
-                  labelId="mes1-label"
-                  value={mesComparar1}
-                  label="Mes 1"
-                  onChange={(e) => setMesComparar1(e.target.value)}
-                >
-                  {meses.map((mes, index) => (
-                    <MenuItem key={index} value={index}>
-                      {mes}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel id="mes2-label">Mes 2</InputLabel>
-                <Select
-                  labelId="mes2-label"
-                  value={mesComparar2}
-                  label="Mes 2"
-                  onChange={(e) => setMesComparar2(e.target.value)}
-                >
-                  {meses.map((mes, index) => (
-                    <MenuItem key={index} value={index}>
-                      {mes}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <Typography variant="body1">
-                <strong>{meses[mesComparar1]}:</strong> {ctComparar1} CT
-              </Typography>
-              <Typography variant="body1">
-                <strong>{meses[mesComparar2]}:</strong> {ctComparar2} CT
-              </Typography>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </Grid>
+          {/* Card 2: Comparar dos meses */}
+          <Grid item xs={12}>
+            <Card elevation={3} style={{ minHeight: '180px' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <CompareArrowsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Comparar Meses
+                </Typography>
+                {cargando ? (
+                  <CircularProgress />
+                ) : (
+                  <>
+                    <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+                      <InputLabel id="mes1-label">Mes 1</InputLabel>
+                      <Select
+                        labelId="mes1-label"
+                        value={mesComparar1}
+                        label="Mes 1"
+                        onChange={(e) => setMesComparar1(e.target.value)}
+                      >
+                        {meses.map((mes, index) => (
+                          <MenuItem key={index} value={index}>
+                            {mes}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel id="mes2-label">Mes 2</InputLabel>
+                      <Select
+                        labelId="mes2-label"
+                        value={mesComparar2}
+                        label="Mes 2"
+                        onChange={(e) => setMesComparar2(e.target.value)}
+                      >
+                        {meses.map((mes, index) => (
+                          <MenuItem key={index} value={index}>
+                            {mes}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Typography variant="body1">
+                      <strong>{meses[mesComparar1]}:</strong> {ctComparar1} CT
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>{meses[mesComparar2]}:</strong> {ctComparar2} CT
+                    </Typography>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
-    {/* Card 3: Producto menos producido */}
-    <Grid item xs={12}>
-      <Card elevation={3} style={{ minHeight: '180px' }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            <TrendingDownIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-            Producto menos producido ({meses[mesSeleccionado]})
-          </Typography>
-          {cargando ? (
-            <CircularProgress />
-          ) : productoMenosProducido ? (
-            <>
-              <Typography variant="body1">
-                <strong>Producto:</strong> {productoMenosProducido.nombre}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Total CT:</strong> {productoMenosProducido.total}
-              </Typography>
-            </>
-          ) : (
-            <Typography>No hay datos para este mes.</Typography>
-          )}
-        </CardContent>
-      </Card>
-    </Grid>
-  </Grid>
-</Box>
+          {/* Card 3: Producto menos producido */}
+          <Grid item xs={12}>
+            <Card elevation={3} style={{ minHeight: '180px' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <TrendingDownIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Producto menos producido ({meses[mesSeleccionado]})
+                </Typography>
+                {cargando ? (
+                  <CircularProgress />
+                ) : productoMenosProducido ? (
+                  <>
+                    <Typography variant="body1">
+                      <strong>Producto:</strong> {productoMenosProducido.nombre}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Total CT:</strong> {productoMenosProducido.total}
+                    </Typography>
+                  </>
+                ) : (
+                  <Typography>No hay datos para este mes.</Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
+          {/* Card 4: Producto más producido */}
+          <Grid item xs={12}>
+            <Card elevation={3} style={{ minHeight: '180px' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <TrendingUpIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Producto más producido ({meses[mesSeleccionado]})
+                </Typography>
+                {cargando ? (
+                  <CircularProgress />
+                ) : productoMasProducido ? (
+                  <>
+                    <Typography variant="body1">
+                      <strong>Producto:</strong> {productoMasProducido.nombre}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Total CT:</strong> {productoMasProducido.total}
+                    </Typography>
+                  </>
+                ) : (
+                  <Typography>No hay datos para este mes.</Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
     </div>
   );
 }

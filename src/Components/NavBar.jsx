@@ -22,6 +22,8 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import { useNavigate } from 'react-router-dom';
 import BarChartIcon from '@mui/icons-material/BarChart';
+
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 70;
 
@@ -82,7 +84,8 @@ export default function Navbar({ open, setOpen }) {
           { text: 'Registro Reporte', icon: <AddCircleOutlineIcon />, route: '/HacerReporte' },
           { text: 'Estadísticas', icon: <InsertChartIcon />, route: '/Estadisticas' },
           { text: 'Graficos', icon: <InsertChartIcon />, route: '/Graficos' },
-          { text: 'Reportes', icon: <BarChartIcon />, route: '/Reportes' }
+          { text: 'Reportes', icon: <BarChartIcon />, route: '/Reportes' },
+          { text: 'Alerta', icon: <WarningAmberIcon />, route: '/Alerta' }
         ].map(({ text, icon, route }) => (
           <ListItem disablePadding key={text}>
             <Tooltip title={!open ? text : ''} placement="right">

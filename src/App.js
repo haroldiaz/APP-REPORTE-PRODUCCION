@@ -9,6 +9,7 @@ import Navbar from './Components/NavBar';
 import { Box } from '@mui/material';
 import Graficos from './Pages/Graficos';
 import Reportes from './Pages/Reportes';
+import Alertas from './Pages/Alertas';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 70;
@@ -39,6 +40,7 @@ function App() {
             <Route path="/Estadisticas" element={<Estadisticas />} />
             <Route path="/Graficos" element={<Graficos />} />
             <Route path="/Reportes" element={<Reportes />} />
+            <Route path="/Alerta" element={<Alertas />} />
           </Routes>
         </Box>
       </Box>
