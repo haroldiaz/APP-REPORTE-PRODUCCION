@@ -93,6 +93,7 @@ function RegistroReporte() {
           maxWidth: 500,
           p: 4,
           boxSizing: 'border-box',
+          margin: 'auto',
         }}
       >
         <Box
@@ -101,6 +102,7 @@ function RegistroReporte() {
             flexDirection: 'column',
             alignItems: 'center',
             gap: 2, // espacio entre los elementos
+          
           }}
         >
           <Typography variant="h6" align="center">

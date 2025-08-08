@@ -88,7 +88,8 @@ function Reportes() {
           style={{
             width: '100%',
             maxWidth: '600px',
-            padding: '80px'
+            padding: '100px',
+            margin: 'auto',
           }}
         >
           <CardContent>

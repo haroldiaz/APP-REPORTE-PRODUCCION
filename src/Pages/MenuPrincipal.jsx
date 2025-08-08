@@ -91,25 +91,26 @@ function MenuPrincipal() {
 
   return (
     <Box
-       sx={{
-        height: '100%', // toda la altura de la pantalla
+      sx={{
+        width: '100%',
+        minHeight: '100vh',
         display: 'flex',
-        justifyContent: 'center',  // centra horizontalmente
-        alignItems: 'center',      // centra verticalmente
-        backgroundColor: '#f5f5f5', // color de fondo claro
-        p: 4,
-    }}
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffffff',
+        p: 1,
+      }}
     >
-        <Grid
-  container
-  spacing={4}
-  justifyContent="center"   // centra horizontalmente
-  alignItems="center"       // centra verticalmente
-  sx={{ maxWidth: 1000 }}
->
-        {/* Total General */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} style={{ height: '100%' }}>
+      <Grid
+        container
+        direction="column"
+        spacing={4}
+        alignItems="center"
+        sx={{ width: '100%', maxWidth: 500 }}
+      >
+        {/* Tarjeta: Total General */}
+        <Grid item sx={{ width: '100%' }}>
+          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total General
@@ -125,9 +126,9 @@ function MenuPrincipal() {
           </Card>
         </Grid>
 
-        {/* Total Mes Actual */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} style={{ height: '100%' }}>
+        {/* Tarjeta: Total Mes Actual */}
+        <Grid item sx={{ width: '100%' }}>
+          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Mes Actual
@@ -143,9 +144,9 @@ function MenuPrincipal() {
           </Card>
         </Grid>
 
-        {/* Total Hoy */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} style={{ height: '100%' }}>
+        {/* Tarjeta: Total Hoy */}
+        <Grid item sx={{ width: '100%' }}>
+          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Hoy
@@ -161,9 +162,9 @@ function MenuPrincipal() {
           </Card>
         </Grid>
 
-        {/* Producto más producido */}
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} style={{ height: '100%' }}>
+        {/* Tarjeta: Producto más producido */}
+        <Grid item sx={{ width: '100%' }}>
+          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Producto más producido este mes
