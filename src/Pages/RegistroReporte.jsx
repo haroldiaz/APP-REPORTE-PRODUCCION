@@ -66,7 +66,7 @@ function RegistroReporte() {
       setAlerta({ tipo: 'success', mensaje: 'Reporte registrado correctamente.' });
       setFormulario({
         fecha: fechaActual,
-        nombreProduccion: '',
+        nombreProduccion: 'Agua Preparada',
         cantidad: '0',
         ct: '0',
         baldes: '0',
@@ -78,132 +78,104 @@ function RegistroReporte() {
   return (
     <Box
       sx={{
-        p: 2,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
         backgroundColor: '#f5f5f5',
+        px: 2,
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          width: '100%',
-          maxWidth: 500,
-          p: 4,
-          boxSizing: 'border-box',
-          margin: 'auto',
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2, // espacio entre los elementos
-          
-          }}
-        >
-          <Typography variant="h6" align="center">
+      <Paper elevation={4} sx={{ p: 4, maxWidth: 500, width: '100%' }}>
+        <Box textAlign="center" mb={3}>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
             Registro de Reporte
           </Typography>
 
-          <Typography variant="body2" align="center">
+          <Typography variant="body2" color="textSecondary">
             <strong>Estado Supabase:</strong> {estadoConexion}
           </Typography>
 
           {formulario.fecha && (
-            <Typography variant="body2" align="center">
+            <Typography variant="body2" color="textSecondary">
               <strong>Fecha del último registro:</strong> {formulario.fecha}
             </Typography>
           )}
+        </Box>
 
-          {alerta && (
-            <Alert severity={alerta.tipo} sx={{ width: '100%' }}>
-              {alerta.mensaje}
-            </Alert>
-          )}
+        {alerta && (
+          <Alert severity={alerta.tipo} sx={{ mb: 2 }}>
+            {alerta.mensaje}
+          </Alert>
+        )}
 
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <InputLabel id="nombreProduccion-label">Nombre del producto</InputLabel>
-              <Select
-                labelId="nombreProduccion-label"
-                name="nombreProduccion"
-                value={formulario.nombreProduccion}
-                onChange={handleChange}
-                fullWidth
-              >
-                <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
-                <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
-                <MenuItem value="Granotex Blanco">Granotex Blanco</MenuItem>
-                <MenuItem value="Graniplas Arena">Graniplas Arena</MenuItem>
-                <MenuItem value="Granotex Arena">Granotex Arena</MenuItem>
-                <MenuItem value="Relleno Fino ">Relleno Fino</MenuItem>
-                <MenuItem value="Relleno Grueso ">Relleno Grueso</MenuItem>
-                <MenuItem value="Mastik">Mastik</MenuItem>
-                <MenuItem value="Estuco Interno">Estuco Interno</MenuItem>
-                <MenuItem value="Estuco Externo">Estuco Externo</MenuItem>
-              </Select>
-            </Grid>
+        <Box component="form" noValidate autoComplete="off" display="flex" flexDirection="column" gap={2}>
+          <Box>
+            <InputLabel id="nombreProduccion-label">Nombre del producto</InputLabel>
+            <Select
+              labelId="nombreProduccion-label"
+              name="nombreProduccion"
+              value={formulario.nombreProduccion}
+              onChange={handleChange}
+              fullWidth
+            >
+              <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
+              <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
+              <MenuItem value="Granotex Blanco">Granotex Blanco</MenuItem>
+              <MenuItem value="Graniplas Arena">Graniplas Arena</MenuItem>
+              <MenuItem value="Granotex Arena">Granotex Arena</MenuItem>
+              <MenuItem value="Relleno Fino">Relleno Fino</MenuItem>
+              <MenuItem value="Relleno Grueso">Relleno Grueso</MenuItem>
+              <MenuItem value="Mastik">Mastik</MenuItem>
+              <MenuItem value="Estuco Interno">Estuco Interno</MenuItem>
+              <MenuItem value="Estuco Externo">Estuco Externo</MenuItem>
+            </Select>
+          </Box>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Cantidad"
-                name="cantidad"
-                value={formulario.cantidad}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
+          <TextField
+            fullWidth
+            type="number"
+            label="Cantidad"
+            name="cantidad"
+            value={formulario.cantidad}
+            onChange={handleChange}
+          />
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="CT"
-                name="ct"
-                value={formulario.ct}
-                onChange={handleChange}
-              />
-            </Grid>
+          <TextField
+            fullWidth
+            type="number"
+            label="CT"
+            name="ct"
+            value={formulario.ct}
+            onChange={handleChange}
+          />
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Baldes"
-                name="baldes"
-                value={formulario.baldes}
-                onChange={handleChange}
-              />
-            </Grid>
+          <TextField
+            fullWidth
+            type="number"
+            label="Baldes"
+            name="baldes"
+            value={formulario.baldes}
+            onChange={handleChange}
+          />
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Galones"
-                name="galones"
-                value={formulario.galones}
-                onChange={handleChange}
-              />
-            </Grid>
+          <TextField
+            fullWidth
+            type="number"
+            label="Galones"
+            name="galones"
+            value={formulario.galones}
+            onChange={handleChange}
+          />
 
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                onClick={handleSubmit}
-              >
-                Registrar
-              </Button>
-            </Grid>
-          </Grid>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handleSubmit}
+          >
+            Registrar
+          </Button>
         </Box>
       </Paper>
     </Box>
