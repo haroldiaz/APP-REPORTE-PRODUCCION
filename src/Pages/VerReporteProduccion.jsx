@@ -3,7 +3,7 @@ import { supabase } from './../Components/supabaseClient';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Typography, Button,
-  TextField, Select, MenuItem, Box, Grid
+  TextField, Select, MenuItem, Box, Grid, TablePagination
 } from '@mui/material';
 
 function VerReporteProduccion() {
@@ -13,6 +13,10 @@ function VerReporteProduccion() {
   const [editandoId, setEditandoId] = useState(null);
   const [formulario, setFormulario] = useState({});
   const [filtros, setFiltros] = useState({ fecha: '', nombreProduccion: '' });
+
+  // 📌 Estados para paginación
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const obtenerReportes = async () => {
@@ -25,7 +29,7 @@ function VerReporteProduccion() {
         console.error('Error al obtener reportes:', error.message);
       } else {
         setReportes(data);
-        setReportesFiltrados(data); // Inicialmente sin filtro
+        setReportesFiltrados(data);
       }
       setCargando(false);
     };
@@ -49,11 +53,13 @@ function VerReporteProduccion() {
     }
 
     setReportesFiltrados(filtrados);
+    setPage(0); // 🔹 Reiniciar a la primera página
   };
 
   const limpiarFiltros = () => {
     setFiltros({ fecha: '', nombreProduccion: '' });
     setReportesFiltrados(reportes);
+    setPage(0);
   };
 
   const eliminarReporte = async (id) => {
@@ -107,6 +113,16 @@ function VerReporteProduccion() {
     }
   };
 
+  // 📌 Funciones de paginación
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
     <Box
       sx={{
@@ -158,136 +174,152 @@ function VerReporteProduccion() {
       {cargando ? (
         <Typography variant="body1">Cargando reportes...</Typography>
       ) : (
-        <TableContainer component={Paper} sx={{ width: '90%', maxWidth: 1000 }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Fecha</strong></TableCell>
-                <TableCell><strong>Nombre</strong></TableCell>
-                <TableCell><strong>Cantidad</strong></TableCell>
-                <TableCell><strong>CTS</strong></TableCell>
-                <TableCell><strong>Baldes</strong></TableCell>
-                <TableCell><strong>Galones</strong></TableCell>
-                <TableCell><strong>Acciones</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {reportesFiltrados.map((reporte) => (
-                <TableRow key={reporte.id}>
-                  <TableCell>
-                    {editandoId === reporte.id ? (
-                      <TextField
-                        type="date"
-                        name="fecha"
-                        value={formulario.fecha ? formulario.fecha.slice(0, 10) : ''}
-                        onChange={handleChange}
-                        size="small"
-                      />
-                    ) : (
-                      new Date(reporte.fecha).toLocaleDateString()
-                    )}
-                  </TableCell>
-
-                  {editandoId === reporte.id ? (
-                    <>
-                      <TableCell>
-                        <Select
-                          fullWidth
-                          name="nombreProduccion"
-                          value={formulario.nombreProduccion}
-                          onChange={handleChange}
-                          size="small"
-                        >
-                          <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
-                          <MenuItem value="Mastik">Mastik</MenuItem>
-                          <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          name="cantidad"
-                          value={formulario.cantidad}
-                          onChange={handleChange}
-                          size="small"
-                          type="number"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          name="ct"
-                          value={formulario.ct}
-                          onChange={handleChange}
-                          size="small"
-                          type="number"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          name="baldes"
-                          value={formulario.baldes}
-                          onChange={handleChange}
-                          size="small"
-                          type="number"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          name="galones"
-                          value={formulario.galones}
-                          onChange={handleChange}
-                          size="small"
-                          type="number"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Button color="primary" size="small" onClick={guardarEdicion}>
-                          Guardar
-                        </Button>
-                        <Button color="inherit" size="small" onClick={cancelarEdicion}>
-                          Cancelar
-                        </Button>
-                      </TableCell>
-                    </>
-                  ) : (
-                    <>
-                      <TableCell>{reporte.nombreProduccion}</TableCell>
-                      <TableCell>{reporte.cantidad}</TableCell>
-                      <TableCell>{reporte.ct}</TableCell>
-                      <TableCell>{reporte.baldes}</TableCell>
-                      <TableCell>{reporte.galones}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => comenzarEdicion(reporte)}
-                          sx={{ mr: 1 }}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          onClick={() => eliminarReporte(reporte.id)}
-                        >
-                          Eliminar
-                        </Button>
-                      </TableCell>
-                    </>
-                  )}
-                </TableRow>
-              ))}
-              {reportesFiltrados.length === 0 && (
+        <Paper sx={{ width: '90%', maxWidth: 1000 }}>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    No hay reportes que coincidan con los filtros.
-                  </TableCell>
+                  <TableCell><strong>Fecha</strong></TableCell>
+                  <TableCell><strong>Nombre</strong></TableCell>
+                  <TableCell><strong>Cantidad</strong></TableCell>
+                  <TableCell><strong>CTS</strong></TableCell>
+                  <TableCell><strong>Baldes</strong></TableCell>
+                  <TableCell><strong>Galones</strong></TableCell>
+                  <TableCell><strong>Acciones</strong></TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {reportesFiltrados
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((reporte) => (
+                    <TableRow key={reporte.id}>
+                      <TableCell>
+                        {editandoId === reporte.id ? (
+                          <TextField
+                            type="date"
+                            name="fecha"
+                            value={formulario.fecha ? formulario.fecha.slice(0, 10) : ''}
+                            onChange={handleChange}
+                            size="small"
+                          />
+                        ) : (
+                          new Date(reporte.fecha).toLocaleDateString()
+                        )}
+                      </TableCell>
+
+                      {editandoId === reporte.id ? (
+                        <>
+                          <TableCell>
+                            <Select
+                              fullWidth
+                              name="nombreProduccion"
+                              value={formulario.nombreProduccion}
+                              onChange={handleChange}
+                              size="small"
+                            >
+                              <MenuItem value="Agua Preparada">Agua Preparada</MenuItem>
+                              <MenuItem value="Mastik">Mastik</MenuItem>
+                              <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
+                            </Select>
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              name="cantidad"
+                              value={formulario.cantidad}
+                              onChange={handleChange}
+                              size="small"
+                              type="number"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              name="ct"
+                              value={formulario.ct}
+                              onChange={handleChange}
+                              size="small"
+                              type="number"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              name="baldes"
+                              value={formulario.baldes}
+                              onChange={handleChange}
+                              size="small"
+                              type="number"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              name="galones"
+                              value={formulario.galones}
+                              onChange={handleChange}
+                              size="small"
+                              type="number"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Button color="primary" size="small" onClick={guardarEdicion}>
+                              Guardar
+                            </Button>
+                            <Button color="inherit" size="small" onClick={cancelarEdicion}>
+                              Cancelar
+                            </Button>
+                          </TableCell>
+                        </>
+                      ) : (
+                        <>
+                          <TableCell>{reporte.nombreProduccion}</TableCell>
+                          <TableCell>{reporte.cantidad}</TableCell>
+                          <TableCell>{reporte.ct}</TableCell>
+                          <TableCell>{reporte.baldes}</TableCell>
+                          <TableCell>{reporte.galones}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              onClick={() => comenzarEdicion(reporte)}
+                              sx={{ mr: 1 }}
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              size="small"
+                              onClick={() => eliminarReporte(reporte.id)}
+                            >
+                              Eliminar
+                            </Button>
+                          </TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  ))}
+                {reportesFiltrados.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">
+                      No hay reportes que coincidan con los filtros.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* 📌 Paginación */}
+          <TablePagination
+            component="div"
+            count={reportesFiltrados.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50]}
+            labelRowsPerPage="Filas por página"
+          />
+        </Paper>
       )}
     </Box>
   );
