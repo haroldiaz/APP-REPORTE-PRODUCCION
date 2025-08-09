@@ -91,7 +91,8 @@ export default function Navbar({ open, setOpen }) {
           { text: 'Estadísticas', icon: <InsertChartIcon />, route: '/Estadisticas' },
           { text: 'Gráficos', icon: <InsertChartIcon />, route: '/Graficos' },
           { text: 'Reportes', icon: <BarChartIcon />, route: '/Reportes' },
-          { text: 'Alerta', icon: <WarningAmberIcon />, route: '/Alerta' }
+          { text: 'Alerta', icon: <WarningAmberIcon />, route: '/Alerta' },
+          { text: 'Configuracion', icon: <WarningAmberIcon />, route: '/Configuracion' }
         ].map(({ text, icon, route }) => (
           <ListItem disablePadding key={text} sx={{ display: 'block' }}>
             <Tooltip title={!open ? text : ''} placement="right">

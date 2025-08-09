@@ -17,7 +17,6 @@ function RegistroReporte() {
   const [formulario, setFormulario] = useState({
     fecha: '',
     nombreProduccion: 'Agua Preparada',
-    cantidad: '0',
     ct: '0',
     baldes: '0',
     galones: '0',
@@ -53,7 +52,7 @@ function RegistroReporte() {
       .insert([{
         fecha: fechaActual,
         nombreProduccion: formulario.nombreProduccion,
-        cantidad: parseInt(formulario.cantidad || '0'),
+       
         ct: parseInt(formulario.ct || '0'),
         baldes: parseInt(formulario.baldes || '0'),
         galones: parseInt(formulario.galones || '0')
@@ -129,17 +128,12 @@ function RegistroReporte() {
               <MenuItem value="Mastik">Mastik</MenuItem>
               <MenuItem value="Estuco Interno">Estuco Interno</MenuItem>
               <MenuItem value="Estuco Externo">Estuco Externo</MenuItem>
+              <MenuItem value="Graniplast Neutro">Graniplast Neutro</MenuItem>
+              <MenuItem value="Granotex Neutro">Granotex Neutro</MenuItem>
             </Select>
+             
           </Box>
 
-          <TextField
-            fullWidth
-            type="number"
-            label="Cantidad"
-            name="cantidad"
-            value={formulario.cantidad}
-            onChange={handleChange}
-          />
 
           <TextField
             fullWidth

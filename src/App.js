@@ -10,6 +10,7 @@ import { Box } from '@mui/material';
 import Graficos from './Pages/Graficos';
 import Reportes from './Pages/Reportes';
 import Alertas from './Pages/Alertas';
+import Configuracion from './Pages/Configuracion';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 70;
@@ -41,6 +42,7 @@ function App() {
             <Route path="/Graficos" element={<Graficos />} />
             <Route path="/Reportes" element={<Reportes />} />
             <Route path="/Alerta" element={<Alertas />} />
+            <Route path="/Configuracion" element={<Configuracion />} />
           </Routes>
         </Box>
       </Box>
