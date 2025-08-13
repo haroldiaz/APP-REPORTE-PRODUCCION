@@ -7,6 +7,7 @@ import {
 import WarningIcon from '@mui/icons-material/Warning';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete'; // ← Importado
+import { useAlertas } from '../Hooks/useAlertas'; // Importa el hook
 
 const productosDisponibles = [
   'Agua Preparada',
@@ -25,20 +26,14 @@ function Alerta() {
   const [producto, setProducto] = useState('');
   const [cantidad, setCantidad] = useState('');
   const [mensaje, setMensaje] = useState('');
-  const [alertas, setAlertas] = useState([]);
+ 
+ const { alertas, setAlertas, cargarAlertas } = useAlertas();
 
-  useEffect(() => {
-    cargarAlertas();
-  }, []);
+ useEffect(() => {
+  cargarAlertas();
+}, [cargarAlertas]); 
 
-  const cargarAlertas = async () => {
-    const { data, error } = await supabase.from('alertas').select('*').order('id', { ascending: false });
-    if (error) {
-      console.error('Error al cargar alertas:', error);
-    } else {
-      setAlertas(data);
-    }
-  };
+ 
 
   const guardarAlerta = async () => {
     if (!producto || !cantidad) {
