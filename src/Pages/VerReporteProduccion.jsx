@@ -3,7 +3,7 @@ import { supabase } from './../Components/supabaseClient';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Typography, Button,
-  TextField, Select, MenuItem, Box, Grid, TablePagination
+  TextField, Select, MenuItem, Box, TablePagination
 } from '@mui/material';
 import FiltrosReporte from './../Components/VerReporteProduccion/FiltrosReporte';
 
@@ -151,17 +151,16 @@ function VerReporteProduccion() {
         ) : (
           <Paper sx={{ width: '90%', maxWidth: 1000 }}>
             
-            <TableContainer>
+          <TableContainer>
           <Table size="small">
             <TableHead>
               <TableRow>
-            <TableCell><strong>Fecha</strong></TableCell>
-            <TableCell><strong>Nombre</strong></TableCell>
-            <TableCell><strong>Cantidad</strong></TableCell>
-            <TableCell><strong>CTS</strong></TableCell>
-            <TableCell><strong>Baldes</strong></TableCell>
-            <TableCell><strong>Galones</strong></TableCell>
-            <TableCell><strong>Acciones</strong></TableCell>
+                <TableCell><strong>Fecha</strong></TableCell>
+                <TableCell><strong>Nombre</strong></TableCell>
+                <TableCell><strong>CTS</strong></TableCell>
+                <TableCell><strong>Baldes</strong></TableCell>
+                <TableCell><strong>Galones</strong></TableCell>
+                <TableCell><strong>Acciones</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -198,15 +197,8 @@ function VerReporteProduccion() {
                 <MenuItem value="Graniplas Blanco">Graniplas Blanco</MenuItem>
                   </Select>
                 </TableCell>
-                <TableCell>
-                  <TextField
-                name="cantidad"
-                value={formulario.cantidad}
-                onChange={handleChange}
-                size="small"
-                type="number"
-                  />
-                </TableCell>
+                
+              
                 <TableCell>
                   <TextField
                 name="ct"
@@ -246,7 +238,6 @@ function VerReporteProduccion() {
                 ) : (
               <>
                 <TableCell>{reporte.nombreProduccion}</TableCell>
-                <TableCell>{reporte.cantidad}</TableCell>
                 <TableCell>{reporte.ct}</TableCell>
                 <TableCell>{reporte.baldes}</TableCell>
                 <TableCell>{reporte.galones}</TableCell>
@@ -282,9 +273,9 @@ function VerReporteProduccion() {
               )}
             </TableBody>
           </Table>
-            </TableContainer>
+          </TableContainer>
 
-            {/* 📌 Paginación */}}
+            {/* 📌 Paginación */}
           <TablePagination
             component="div"
             count={reportesFiltrados.length}
