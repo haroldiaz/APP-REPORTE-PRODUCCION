@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './../Components/supabaseClient';
 import {
-  Grid,
   TextField,
   Button,
   Typography,

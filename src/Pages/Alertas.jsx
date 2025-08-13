@@ -46,7 +46,7 @@ function Alerta() {
       return;
     }
 
-    const { data, error } = await supabase
+    const {  error } = await supabase
       .from('alertas')
       .insert([{
         producto,
