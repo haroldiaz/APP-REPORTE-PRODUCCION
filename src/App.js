@@ -11,6 +11,7 @@ import Graficos from './Pages/Graficos';
 import Reportes from './Pages/Reportes';
 import Alertas from './Pages/Alertas';
 import Configuracion from './Pages/Configuracion';
+import ReporteProducto from './Pages/ReporteProducto';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 70;
@@ -43,6 +44,7 @@ function App() {
             <Route path="/Reportes" element={<Reportes />} />
             <Route path="/Alerta" element={<Alertas />} />
             <Route path="/Configuracion" element={<Configuracion />} />
+            <Route path="/ReporteProducto" element={<ReporteProducto />} />
           </Routes>
         </Box>
       </Box>
