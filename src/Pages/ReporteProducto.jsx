@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -6,7 +6,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   MenuItem,
   Select,
   Table,
@@ -19,6 +18,7 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
+import { supabase } from "./../Components/supabaseClient";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 
 function ReporteProducto() {
@@ -31,6 +31,23 @@ function ReporteProducto() {
     estado: "Evolución",
   });
 
+  // Cargar productos al iniciar
+  useEffect(() => {
+    const fetchProductos = async () => {
+      const { data, error } = await supabase
+        .from("ReporteProducto")
+        .select("*")
+        .order("fecha", { ascending: false });
+
+      if (error) {
+        console.error("Error cargando datos:", error.message);
+      } else {
+        setProductos(data);
+      }
+    };
+    fetchProductos();
+  }, []);
+
   const abrirModal = () => setOpen(true);
   const cerrarModal = () => setOpen(false);
 
@@ -38,9 +55,31 @@ function ReporteProducto() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const registrarProducto = (e) => {
+  const registrarProducto = async (e) => {
     e.preventDefault();
-    setProductos([...productos, form]);
+
+    // Insertar en Supabase
+    const { data, error } = await supabase
+      .from("ReporteProducto")
+      .insert([
+        {
+          nombre: form.nombre,
+          fecha: form.fecha,
+          nota: form.nota,
+          estado: form.estado,
+        },
+      ])
+      .select();
+
+    if (error) {
+      console.error("Error al insertar:", error.message);
+      return;
+    }
+
+    // Agregar a la tabla local sin recargar
+    setProductos((prev) => [...data, ...prev]);
+
+    // Resetear formulario
     setForm({ nombre: "", fecha: "", nota: "", estado: "Evolución" });
     cerrarModal();
   };
@@ -70,8 +109,8 @@ function ReporteProducto() {
                 </TableCell>
               </TableRow>
             ) : (
-              productos.map((p, i) => (
-                <TableRow key={i}>
+              productos.map((p) => (
+                <TableRow key={p.id}>
                   <TableCell>{p.nombre}</TableCell>
                   <TableCell>{p.fecha}</TableCell>
                   <TableCell>{p.nota}</TableCell>
@@ -95,7 +134,9 @@ function ReporteProducto() {
       {/* Modal con formulario */}
       <Dialog open={open} onClose={cerrarModal}>
         <DialogTitle>Registrar Producto</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+        >
           <TextField
             label="Nombre del producto"
             name="nombre"
