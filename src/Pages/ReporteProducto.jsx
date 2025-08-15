@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   MenuItem,
   Select,
   Table,
@@ -20,75 +21,102 @@ import {
 } from "@mui/material";
 import { supabase } from "./../Components/supabaseClient";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function ReporteProducto() {
   const [productos, setProductos] = useState([]);
   const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({
     nombre: "",
     fecha: "",
     nota: "",
-    estado: "Evolución",
+    estado: "Devolución",
   });
 
-  // Cargar productos al iniciar
+  // Cargar datos al iniciar
   useEffect(() => {
-    const fetchProductos = async () => {
-      const { data, error } = await supabase
-        .from("ReporteProducto")
-        .select("*")
-        .order("fecha", { ascending: false });
-
-      if (error) {
-        console.error("Error cargando datos:", error.message);
-      } else {
-        setProductos(data);
-      }
-    };
     fetchProductos();
   }, []);
 
-  const abrirModal = () => setOpen(true);
+  const fetchProductos = async () => {
+    const { data, error } = await supabase.from("ReporteProducto").select("*");
+    if (!error) setProductos(data);
+    else console.error(error);
+  };
+
+  const abrirModal = (producto = null) => {
+    if (producto) {
+      setEditId(producto.id);
+      setForm({
+        nombre: producto.nombre,
+        fecha: producto.fecha,
+        nota: producto.nota,
+        estado: producto.estado,
+      });
+    } else {
+      setEditId(null);
+      setForm({ nombre: "", fecha: "", nota: "", estado: "Devolución" });
+    }
+    setOpen(true);
+  };
+
   const cerrarModal = () => setOpen(false);
 
   const manejarCambio = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const registrarProducto = async (e) => {
+  const guardarProducto = async (e) => {
     e.preventDefault();
 
-    // Insertar en Supabase
-    const { data, error } = await supabase
-      .from("ReporteProducto")
-      .insert([
-        {
-          nombre: form.nombre,
-          fecha: form.fecha,
-          nota: form.nota,
-          estado: form.estado,
-        },
-      ])
-      .select();
-
-    if (error) {
-      console.error("Error al insertar:", error.message);
-      return;
+    if (editId) {
+      // Editar en Supabase
+      const { error } = await supabase
+        .from("ReporteProducto")
+        .update(form)
+        .eq("id", editId);
+      if (error) console.error(error);
+    } else {
+      // Insertar en Supabase
+      const { error } = await supabase.from("ReporteProducto").insert([form]);
+      if (error) console.error(error);
     }
 
-    // Agregar a la tabla local sin recargar
-    setProductos((prev) => [...data, ...prev]);
-
-    // Resetear formulario
-    setForm({ nombre: "", fecha: "", nota: "", estado: "Evolución" });
+    await fetchProductos();
     cerrarModal();
+  };
+
+  const eliminarProducto = async (id) => {
+    const { error } = await supabase
+      .from("ReporteProducto")
+      .delete()
+      .eq("id", id);
+    if (error) console.error(error);
+    else fetchProductos();
   };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Reporte de Productos
-      </Typography>
+      {/* Encabezado con botón Registrar */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h5">Reporte de Productos</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AppRegistrationIcon />}
+          onClick={() => abrirModal()}
+        >
+          Registrar
+        </Button>
+      </Box>
 
       {/* Tabla */}
       <TableContainer component={Paper} sx={{ mb: 2 }}>
@@ -99,12 +127,13 @@ function ReporteProducto() {
               <TableCell>Fecha</TableCell>
               <TableCell>Nota</TableCell>
               <TableCell>Estado</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {productos.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={5} align="center">
                   No hay productos registrados
                 </TableCell>
               </TableRow>
@@ -115,6 +144,22 @@ function ReporteProducto() {
                   <TableCell>{p.fecha}</TableCell>
                   <TableCell>{p.nota}</TableCell>
                   <TableCell>{p.estado}</TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      color="primary"
+                      onClick={() => abrirModal(p)}
+                      size="small"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => eliminarProducto(p.id)}
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -122,18 +167,11 @@ function ReporteProducto() {
         </Table>
       </TableContainer>
 
-      {/* Botón Registrar */}
-      <Button
-        variant="contained"
-        startIcon={<AppRegistrationIcon />}
-        onClick={abrirModal}
-      >
-        Registrar
-      </Button>
-
       {/* Modal con formulario */}
       <Dialog open={open} onClose={cerrarModal}>
-        <DialogTitle>Registrar Producto</DialogTitle>
+        <DialogTitle>
+          {editId ? "Editar Producto" : "Registrar Producto"}
+        </DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
         >
@@ -170,7 +208,7 @@ function ReporteProducto() {
             onChange={manejarCambio}
             fullWidth
           >
-            <MenuItem value="Evolución">Devolución</MenuItem>
+            <MenuItem value="Devolución">Devolución</MenuItem>
             <MenuItem value="Dañado">Dañado</MenuItem>
             <MenuItem value="Cambio">Cambio</MenuItem>
           </Select>
@@ -179,8 +217,8 @@ function ReporteProducto() {
           <Button onClick={cerrarModal} color="inherit">
             Cancelar
           </Button>
-          <Button onClick={registrarProducto} variant="contained">
-            Guardar
+          <Button onClick={guardarProducto} variant="contained">
+            {editId ? "Actualizar" : "Guardar"}
           </Button>
         </DialogActions>
       </Dialog>
