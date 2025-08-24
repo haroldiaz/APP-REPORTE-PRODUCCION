@@ -16,6 +16,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import SearchIcon from '@mui/icons-material/Search';
 
 function Estadisticas() {
   const [data, setData] = useState([]);
@@ -28,6 +29,9 @@ function Estadisticas() {
   const [ctComparar2, setCtComparar2] = useState(0);
   const [productoMenosProducido, setProductoMenosProducido] = useState(null);
   const [productoMasProducido, setProductoMasProducido] = useState(null);
+
+  const [productoSeleccionado, setProductoSeleccionado] = useState('');
+  const [totalProductoSeleccionado, setTotalProductoSeleccionado] = useState(0);
 
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -107,14 +111,56 @@ function Estadisticas() {
     setCtComparar2(totalMes(mesComparar2));
     setProductoMenosProducido(productoMenos);
     setProductoMasProducido(productoMas);
-  }, [mesSeleccionado, mesComparar1, mesComparar2, data]);
+
+    if (productoSeleccionado) {
+      setTotalProductoSeleccionado(produccionPorProducto[productoSeleccionado] || 0);
+    }
+  }, [mesSeleccionado, mesComparar1, mesComparar2, data, productoSeleccionado]);
 
   return (
     <div>
       <Box p={3} display="flex" justifyContent="center">
         <Grid container spacing={3} direction="column" style={{ maxWidth: 500, width: '100%' }}>
           
-          {/* Card 1: Total de un solo mes */}
+          {/* --- AHORA LA CARD DE PRODUCTO ESPECÍFICO VA PRIMERA --- */}
+          <Grid item xs={12}>
+            <Card elevation={3} style={{ minHeight: '180px' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <SearchIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Producción de un producto específico ({meses[mesSeleccionado]})
+                </Typography>
+                {cargando ? (
+                  <CircularProgress />
+                ) : (
+                  <>
+                    <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
+                      <InputLabel id="producto-label">Selecciona un producto</InputLabel>
+                      <Select
+                        labelId="producto-label"
+                        value={productoSeleccionado}
+                        label="Selecciona un producto"
+                        onChange={(e) => setProductoSeleccionado(e.target.value)}
+                      >
+                        {[...new Set(data.map(item => item.nombreProduccion))].map((prod, idx) => (
+                          <MenuItem key={idx} value={prod}>
+                            {prod}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    {productoSeleccionado && (
+                      <Typography variant="body1">
+                        Total de <strong>{productoSeleccionado}</strong> en {meses[mesSeleccionado]}: <strong>{totalProductoSeleccionado}</strong> CT
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Card: Total de un solo mes */}
           <Grid item xs={12}>
             <Card elevation={3} style={{ minHeight: '180px' }}>
               <CardContent>
@@ -150,7 +196,7 @@ function Estadisticas() {
             </Card>
           </Grid>
 
-          {/* Card 2: Comparar dos meses */}
+          {/* Card: Comparar dos meses */}
           <Grid item xs={12}>
             <Card elevation={3} style={{ minHeight: '180px' }}>
               <CardContent>
@@ -204,7 +250,7 @@ function Estadisticas() {
             </Card>
           </Grid>
 
-          {/* Card 3: Producto menos producido */}
+          {/* Card: Producto menos producido */}
           <Grid item xs={12}>
             <Card elevation={3} style={{ minHeight: '180px' }}>
               <CardContent>
@@ -230,7 +276,7 @@ function Estadisticas() {
             </Card>
           </Grid>
 
-          {/* Card 4: Producto más producido */}
+          {/* Card: Producto más producido */}
           <Grid item xs={12}>
             <Card elevation={3} style={{ minHeight: '180px' }}>
               <CardContent>
