@@ -58,7 +58,8 @@ export default function Navbar({ open, setOpen }) {
     { text: 'Reportes', icon: <BarChartIcon />, route: '/Reportes' },
     { text: 'Alerta', icon: <WarningAmberIcon />, route: '/Alerta' },
     { text: 'Configuracion', icon: <WarningAmberIcon />, route: '/Configuracion' },
-    { text: 'Reporte Producto', icon: <AppRegistrationIcon />, route: '/ReporteProducto' }
+    { text: 'Reporte Producto', icon: <AppRegistrationIcon />, route: '/ReporteProducto' },
+    { text: 'SeleccionColor', icon: <AppRegistrationIcon />, route: '/SeleccionColor' }
   ];
 
   return (

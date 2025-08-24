@@ -3,7 +3,8 @@ import { supabase } from '../Components/supabaseClient';
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line
+  ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line,
+  AreaChart, Area
 } from 'recharts';
 import {
   CircularProgress, Typography, Box, Paper, Stack
@@ -34,7 +35,7 @@ function Graficos() {
     cargarDatos();
   }, []);
 
-  // Agrupación por fecha (para barras)
+  // Agrupación por fecha (para barras y área)
   const datosBarras = (() => {
     const porDia = {};
     for (const item of data) {
@@ -54,7 +55,7 @@ function Graficos() {
     return Object.entries(porProducto).map(([nombre, ct]) => ({ name: nombre, value: ct }));
   })();
 
-  // Agrupación por fecha y producto (para líneas)
+  // Agrupación por fecha y producto (para líneas y barras apiladas)
   const datosLineas = (() => {
     const agrupado = {};
     for (const item of data) {
@@ -78,7 +79,6 @@ function Graficos() {
 
   return (
     <div>
-      
       <Box p={4}>
         <Stack spacing={4}>
           {/* Gráfico de barras */}
@@ -157,6 +157,54 @@ function Graficos() {
                     />
                   ))}
                 </LineChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+
+          {/* Gráfico de barras apiladas */}
+          <Paper elevation={4} style={{ padding: '10px', width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Producción diaria por producto (Barras Apiladas)
+            </Typography>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={datosLineas}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="fecha" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  {clavesProductos.map((producto, index) => (
+                    <Bar
+                      key={producto}
+                      dataKey={producto}
+                      stackId="a"
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+
+          {/* Gráfico de área */}
+          <Paper elevation={4} style={{ padding: '10px', width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Producción acumulada en el tiempo
+            </Typography>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={datosBarras}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="fecha" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="ct" stroke="#8884d8" fill="#8884d8" />
+                </AreaChart>
               </ResponsiveContainer>
             )}
           </Paper>
