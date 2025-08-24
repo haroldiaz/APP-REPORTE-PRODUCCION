@@ -13,6 +13,7 @@ import Alertas from './Pages/Alertas';
 import Configuracion from './Pages/Configuracion';
 import ReporteProducto from './Pages/ReporteProducto';
 import SeleccionarColor from './Pages/SeleccionarColor';
+import RegistroLogs from './Pages/RegistroLogs';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 70;
@@ -47,6 +48,7 @@ function App() {
             <Route path="/Configuracion" element={<Configuracion />} />
             <Route path="/ReporteProducto" element={<ReporteProducto />} />
             <Route path="/SeleccionColor" element={<SeleccionarColor />} />
+            <Route path="/Logs" element={<RegistroLogs />} />
           </Routes>
         </Box>
       </Box>
