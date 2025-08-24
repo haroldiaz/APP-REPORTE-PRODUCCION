@@ -50,7 +50,7 @@ export default function Navbar({ open, setOpen }) {
   };
 
   const navItems = [
-    { text: 'Menú Principal', icon: <HomeIcon />, route: '/' },
+    { text: 'Menú Principal', icon: <HomeIcon />, route: '/menu' },
     { text: 'Tabla Reporte', icon: <EventNoteIcon />, route: '/VerReporte' },
     { text: 'Registro Reporte', icon: <AddCircleOutlineIcon />, route: '/HacerReporte' },
     { text: 'Estadísticas', icon: <InsertChartIcon />, route: '/Estadisticas' },
