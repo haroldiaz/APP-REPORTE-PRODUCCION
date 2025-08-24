@@ -4,7 +4,7 @@ import { supabase } from '../Components/supabaseClient';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line,
-  AreaChart, Area
+  AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 import {
   CircularProgress, Typography, Box, Paper, Stack
@@ -45,7 +45,7 @@ function Graficos() {
     return Object.entries(porDia).map(([fecha, ct]) => ({ fecha, ct }));
   })();
 
-  // Agrupación por producto (para pastel)
+  // Agrupación por producto (para pastel y radar)
   const datosPastel = (() => {
     const porProducto = {};
     for (const item of data) {
@@ -205,6 +205,32 @@ function Graficos() {
                   <Tooltip />
                   <Area type="monotone" dataKey="ct" stroke="#8884d8" fill="#8884d8" />
                 </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </Paper>
+
+          {/* Gráfico de araña (Radar) */}
+          <Paper elevation={4} style={{ padding: '10px', width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Comparación de producción por producto (Radar)
+            </Typography>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={datosPastel}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="name" />
+                  <PolarRadiusAxis />
+                  <Radar
+                    name="Producción"
+                    dataKey="value"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                    fillOpacity={0.6}
+                  />
+                  <Tooltip />
+                </RadarChart>
               </ResponsiveContainer>
             )}
           </Paper>
