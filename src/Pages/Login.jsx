@@ -17,9 +17,9 @@ export default function Login() {
   };
 
   const handleContinuar = () => {
-    const codigoFinal = codigo.join("");
+    const codigoFinal = parseInt(codigo.join(""), 10);
 
-    if (String(codigoFinal) === String(codigoCorrecto)) {
+    if (codigoFinal === codigoCorrecto) {
       setMensaje({ tipo: "success", texto: "✅ Código correcto, bienvenido." });
       navigate("/menu");
     } else {
