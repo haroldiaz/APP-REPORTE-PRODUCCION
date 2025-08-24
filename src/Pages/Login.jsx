@@ -18,7 +18,10 @@ export default function Login() {
 
   const handleContinuar = () => {
     const codigoFinal = codigo.join("");
-
+    console.log("Código ingresado:", codigoFinal);
+        console.log("Código correcto:", codigoCorrecto);
+        
+        // ✅ Comparar como strings
     if (codigoFinal === codigoCorrecto) {
       setMensaje({ tipo: "success", texto: "✅ Código correcto, bienvenido." });
       navigate("/menu");
