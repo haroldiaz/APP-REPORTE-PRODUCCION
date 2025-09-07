@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Box, TextField, Button, Typography, Stack, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -10,18 +10,32 @@ export default function Login() {
   // ✅ Código correcto desde .env
   const codigoCorrecto = process.env.REACT_APP_USER;
 
+  // Crear referencias para los inputs
+  const inputRefs = useRef([]);
+
   const handleChange = (value, index) => {
     const newCodigo = [...codigo];
     newCodigo[index] = value.slice(-1); // solo último dígito
     setCodigo(newCodigo);
+
+    // Si el usuario escribe y no estamos en el último campo → mover foco
+    if (value && index < codigo.length - 1) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !codigo[index] && index > 0) {
+      // Si está vacío y presiona Backspace → volver al anterior
+      inputRefs.current[index - 1].focus();
+    }
   };
 
   const handleContinuar = () => {
     const codigoFinal = codigo.join("");
     console.log("Código ingresado:", codigoFinal);
-        console.log("Código correcto:", codigoCorrecto);
-        
-        // ✅ Comparar como strings
+    console.log("Código correcto:", codigoCorrecto);
+
     if (codigoFinal === codigoCorrecto) {
       setMensaje({ tipo: "success", texto: "✅ Código correcto, bienvenido." });
       navigate("/menu");
@@ -48,7 +62,7 @@ export default function Login() {
         p={{ xs: 2, sm: 4 }}
         sx={{
           width: "100%",
-          maxWidth: { xs: 300, sm: 400 }, // más pequeño en móviles
+          maxWidth: { xs: 300, sm: 400 },
           bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 3,
@@ -58,7 +72,7 @@ export default function Login() {
         <Typography
           variant="h6"
           sx={{
-            fontSize: { xs: "16px", sm: "20px" }, // más pequeño en móvil
+            fontSize: { xs: "16px", sm: "20px" },
             mb: 2,
           }}
         >
@@ -71,12 +85,14 @@ export default function Login() {
               key={i}
               value={num}
               onChange={(e) => handleChange(e.target.value, i)}
+              onKeyDown={(e) => handleKeyDown(e, i)}
+              inputRef={(el) => (inputRefs.current[i] = el)}
               inputProps={{
                 maxLength: 1,
                 style: { textAlign: "center", fontSize: "18px" },
               }}
               sx={{
-                width: { xs: "40px", sm: "55px" }, // reducido en móviles
+                width: { xs: "40px", sm: "55px" },
               }}
             />
           ))}
@@ -87,7 +103,7 @@ export default function Login() {
           color="primary"
           onClick={handleContinuar}
           sx={{
-            width: { xs: "100%", sm: "80%" }, // ocupa todo en móvil, menos en desktop
+            width: { xs: "100%", sm: "80%" },
             fontSize: { xs: "14px", sm: "16px" },
             py: { xs: 1, sm: 1.5 },
           }}
@@ -101,7 +117,7 @@ export default function Login() {
             sx={{
               mt: 2,
               width: "100%",
-              fontSize: { xs: "13px", sm: "15px" }, // más compacto en móvil
+              fontSize: { xs: "13px", sm: "15px" },
             }}
           >
             {mensaje.texto}
