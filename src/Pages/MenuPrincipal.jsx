@@ -9,6 +9,12 @@ import {
   Grid
 } from '@mui/material';
 
+// Importar íconos
+import SummarizeIcon from '@mui/icons-material/Summarize'; // Total General
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'; // Mes actual
+import TodayIcon from '@mui/icons-material/Today'; // Hoy
+import StarIcon from '@mui/icons-material/Star'; // Producto más producido
+
 function MenuPrincipal() {
   const [data, setData] = useState([]);
   const [totalCT, setTotalCT] = useState(0);
@@ -94,27 +100,26 @@ function MenuPrincipal() {
       sx={{
         width: '100%',
         minHeight: '100vh',
-        display: 'flex',
+        display: 'block',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#ffffffff',
-        p: 1,
+        p: 4,
       }}
     >
       <Grid
         container
-        direction="column"
         spacing={4}
-        alignItems="center"
-        sx={{ width: '100%', maxWidth: 500 }}
+        sx={{ width: '100%', maxWidth: 680, height: "80%", maxHeight:400, margin: '0 auto' }}
       >
         {/* Tarjeta: Total General */}
-        <Grid item sx={{ width: '100%' }}>
-          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Total General
-              </Typography>
+        <Grid item xs={12} sm={4} sx={{ height: 200,width: 200, }}>
+          <Card elevation={3} sx={{ height: "100%", display: 'flex', alignItems: 'center' }}>
+            <CardContent sx={{ flex: 1 }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <SummarizeIcon color="primary" />
+                <Typography variant="h6">Total General</Typography>
+              </Box>
               {cargando ? (
                 <CircularProgress />
               ) : (
@@ -127,12 +132,13 @@ function MenuPrincipal() {
         </Grid>
 
         {/* Tarjeta: Total Mes Actual */}
-        <Grid item sx={{ width: '100%' }}>
-          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Total Mes Actual
-              </Typography>
+        <Grid item xs={12} sm={6} sx={{ height: 200, width: 200}}>
+          <Card elevation={3} sx={{ height: "100%", display: 'flex', alignItems: 'center' }}>
+            <CardContent sx={{ flex: 1 }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <CalendarMonthIcon color="secondary" />
+                <Typography variant="h6">Total Mes Actual</Typography>
+              </Box>
               {cargando ? (
                 <CircularProgress />
               ) : (
@@ -145,12 +151,13 @@ function MenuPrincipal() {
         </Grid>
 
         {/* Tarjeta: Total Hoy */}
-        <Grid item sx={{ width: '100%' }}>
-          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Total Hoy
-              </Typography>
+        <Grid item xs={12} sm={6} sx={{ height: 200,width: 200, }}>
+          <Card elevation={3} sx={{ height: "100%", display: 'flex', alignItems: 'center' }}>
+            <CardContent sx={{ flex: 1 }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <TodayIcon color="success" />
+                <Typography variant="h6">Total Hoy</Typography>
+              </Box>
               {cargando ? (
                 <CircularProgress />
               ) : (
@@ -163,12 +170,13 @@ function MenuPrincipal() {
         </Grid>
 
         {/* Tarjeta: Producto más producido */}
-        <Grid item sx={{ width: '100%' }}>
-          <Card elevation={3} sx={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Producto más producido este mes
-              </Typography>
+        <Grid item xs={12} sm={6} sx={{ height: 250,width: '100%' }}>
+          <Card elevation={3} sx={{ height: "100%", display: 'flex', alignItems: 'center' }}>
+            <CardContent sx={{ flex: 1 }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <StarIcon color="warning" />
+                <Typography variant="h6">Producto más producido</Typography>
+              </Box>
               {cargando ? (
                 <CircularProgress />
               ) : productoTop ? (
